@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import './../css/index.css';
 import Casino from '../../build/contracts/Casino.json';
 const contract = require('truffle-contract');
+import getWeb3 from '../utils/getWeb3.js';
 
 class App extends React.Component {
   constructor(props){
@@ -11,7 +12,8 @@ class App extends React.Component {
     this.state = {
       lastWinner: 0,
       timer: 0,
-      web3: null
+      web3: null,
+      contracts: {}
     }
   }
 
@@ -19,28 +21,35 @@ class App extends React.Component {
     console.log(number + "VOTED");
   }
 
-  componentDidMount() {
-    this.init();
+  componentWillMount() {
+    // Get network provider and web3 instance.
+    // See utils/getWeb3 for more info.
+
+    getWeb3
+    .then(results => {
+      this.setState({
+        web3: results.web3
+      })
+
+      // Instantiate contract once web3 provided.
+      this.instantiateContract()
+    })
+    .catch(() => {
+      console.log('Error finding web3.')
+    })
   }
 
-  init(){
-    if (typeof web3 !== 'undefined') {
-      App.web3Provider = web3.currentProvider;
-      console.log("connected to external provider")
-    } else {
-      // If no injected web3 instance is detected, fall back to Ganache
-      App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
-      console.log("connected to ganache")
-    }
+  instantiateContract() {
+    const casino = contract(Casino)
+    casino.setProvider(this.state.web3.currentProvider)
 
-    this.setState({web3: new Web3(App.web3Provider)}, this.instantiateContract);
-  }
+    // Declaring this for later so we can chain functions on SimpleStorage.
+    var casinoInstance;
 
-  instantiateContract(){
-    console.log("instantiating contracts, state is: ", this.state);
-    const Casino = contract(Casino);
-    Casino.setProvider(this.state.web3.currentProvider);
-    console.log(Casino)
+    casino.deployed().then((instance) => {
+      casinoInstance = instance
+      console.log('CASINO', casinoInstance);
+    });
   }
 
   render(){
