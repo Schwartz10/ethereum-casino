@@ -13,11 +13,22 @@ class App extends React.Component {
       lastWinner: 0,
       timer: 0,
       web3: null,
-      contracts: {}
+      contract: {}
     }
   }
 
   voteNumber(number) {
+    this.state.contract.bet(number, {
+      gas: 300000,
+      from: web3.eth.accounts[0],
+      value: web3.toWei(0.1, 'ether')
+    })
+
+    // , (err, result) => {
+    //   // Result is the transaction address of that function
+    //   if (err) console.log(err);
+    //   else console.log(result);
+    // })
     console.log(number + "VOTED");
   }
 
@@ -49,6 +60,7 @@ class App extends React.Component {
     casino.deployed().then((instance) => {
       casinoInstance = instance
       console.log('CASINO', casinoInstance);
+      this.setState({contract: casinoInstance});
     });
   }
 
