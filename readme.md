@@ -10,3 +10,5 @@ up the index.html file and clear the cache on every request (good for developmen
 NOTE - tomorrow you need to reinstall metamask and remigrate contracts
 - if you shut down your blockchain and then load it back up again, metamask
 still thinks its working on the same blockchain so the transaction hashes are off
+- also write a function that gets called that calls the smart contract functions
+
